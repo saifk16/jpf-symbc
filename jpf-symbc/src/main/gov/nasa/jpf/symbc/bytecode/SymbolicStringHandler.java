@@ -1148,9 +1148,25 @@ public class SymbolicStringHandler {
 	public Instruction handleSubString(JVMInvokeInstruction invInst, ThreadInfo th) {
 		int numStackSlots = invInst.getArgSize();
 		if (numStackSlots == 2) {
-			return handleSubString1(invInst, th);
+            ChoiceGenerator<?> cg;
+            if (!th.isFirstStepInsn()) { // first time around
+                cg = new PCChoiceGenerator(3);
+                th.getVM().setNextChoiceGenerator(cg);
+                return invInst;
+            } else {
+                handleSubString1(invInst, th);
+                return invInst.getNext(th);
+            }
 		} else {
-			return handleSubString2(invInst, th);
+            ChoiceGenerator<?> cg;
+            if (!th.isFirstStepInsn()) { // first time around
+                cg = new PCChoiceGenerator(5);
+                th.getVM().setNextChoiceGenerator(cg);
+                return invInst;
+            } else {
+                handleSubString2(invInst, th);
+                return invInst.getNext(th);
+            }
 		}
 	}
 
